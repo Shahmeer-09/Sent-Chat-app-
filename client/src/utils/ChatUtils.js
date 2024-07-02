@@ -5,7 +5,7 @@ const getSender = (users, current)=>{
 }
 
 const isSameSender = (msg, current)=>{
-    if(msg.sender._id == current._id){
+    if(msg?.sender?._id == current?._id){
        return true
     }
     else{

@@ -5,12 +5,12 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   server:{
-    // proxy:{
-    //   "/s1":{
-    //     target:"http://localhost:8000",
-    //     secure:false,
-    //   }
-    // }
+    proxy:{
+      "/s1":{
+        target:"https://sent-rose.vercel.app",
+        secure:false,
+      }
+    }
   }, 
   // resolve: {
   //   alias: {

@@ -57,8 +57,7 @@ const ChatSecction = () => {
    
     channel.bind('recieved', function(newmessage){
       const gotMessage = newmessage?.message
-      if(gotMessage?.sender._id != current._id ){
-        console.log(gotMessage)
+      if(gotMessage?.sender?._id != current?._id ){
         setmessages((prev) => [...prev, gotMessage]);
       }
     });
