@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Authpage from "./pages/Authpage";
 const Main = lazy(() => import("./pages/Main"));
 import Home from "./pages/Home";
-// import { loader as mainLoader } from "./pages/Main";
+import { loader as mainLoader } from "./pages/Main";
 import Private from "./components/Private";
 import { RecoilRoot } from "recoil";
 function App() {
@@ -14,7 +14,7 @@ function App() {
       children: [
         {
           index: true,
-          // loader: mainLoader,
+          loader: mainLoader,
           element: <Main />,
         },
         {

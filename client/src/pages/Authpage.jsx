@@ -11,16 +11,13 @@ const Authpage = () => {
 
   const navigate = useNavigate()
   const switchvalue = useRecoilValue(switchScreen);
-  const [local,setlocal] = useState('')
+  const  current = useRecoilValue(UserAtom)
   // const current = useRecoilValue(UserAtom);
    
- useEffect(()=>{
-      const value = sessionStorage.getItem('user')
-      setlocal(JSON.parse(value))
-      if(local){
-        navigate('/')
-      }
- },[])    
+   if(current){
+    navigate("/")
+   
+   }  
 
 
   return (

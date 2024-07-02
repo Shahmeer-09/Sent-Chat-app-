@@ -56,37 +56,41 @@ const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "https://sent-xi.vercel.app/",
-}}); 
-
+  }
+});
 
 io.on("connection", (socket) => {
   socket.on("setup", (user) => {
-    console.log(user)
+    console.log("User setup:", user);
     socket.join(user?._id);
     socket.emit("connected");
+    socket.user = user;  // Store the user information
   });
 
   socket.on("join chat", (chatid) => {  
     socket.join(chatid);
-    console.log(`user joined room ${chatid}`);
+    console.log(`User joined room: ${chatid}`);
   });
+
   socket.on("new message", (message) => {
     const chat = message?.chatid;
+    console.log("New message received:", message);
 
-    // if(!chat?.members) return console.log("chat.members not defined");
-    // chat?.members.forEach((user) => {
-    //   // if (user._id == message.senderid) return;
-    //   socket.in(user).emit("message recieved", message);
-    // });
-    socket.in(user._id).emit("message recieved", message);
-  
-  //  socket.in(chat._id).emit("message recieved", message);
+    if (!chat?.members) {
+      return console.log("chat.members not defined");
+    }
+
+    chat.members.forEach((user) => {
+      // Ensure user is an ID
+      socket.to(user).emit("message received", message);
+    });
   });
 
   socket.on("disconnect", () => {
     const user = socket.user;
     if (user) {
-      socket.leave(user._id);   
+      socket.leave(user._id);
+      console.log(`User disconnected: ${user._id}`);
     }
   });
 });
