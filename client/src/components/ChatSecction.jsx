@@ -76,14 +76,14 @@ const ChatSecction = () => {
  
   useEffect(() => {
     socket.on("message recieved", (newmessage) => {
-       if(!comparechats || comparechats._id !== newmessage.chatid){
-          if(!notif.includes(newmessage)){
-          setnotif((prev)=>[...prev,newmessage])
-          }
-       } else{
-            console.log(newmessage)
+      //  if(!comparechats || comparechats._id !== newmessage.chatid){
+      //     if(!notif.includes(newmessage)){
+      //     setnotif((prev)=>[...prev,newmessage])
+      //     }
+      //  } else{
+            console.log("you got a message")
         setmessages((prev) => [...prev, newmessage]);
-       }
+      //  }
      
     });
   },[setmessage, setnotif]);

@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const corsOptions = {
-  origin: ["https://sent-chat-app.vercel.app/", "http://localhost:5173"],
+  origin: ["https://sent-xi.vercel.app/", "http://localhost:5173"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
@@ -55,7 +55,7 @@ const server = http.createServer(app);
 const io = require("socket.io")(server, {  
   pingTimeout: 60000,
   cors: {
-    origin: "https://sent-chat-app.vercel.app/",
+    origin: "https://sent-xi.vercel.app/",
 }}); 
 
 
@@ -73,12 +73,12 @@ io.on("connection", (socket) => {
   socket.on("new message", (message) => {
     const chat = message?.chatid;
 
-    if(!chat?.members) return console.log("chat.members not defined");
-    chat?.members.forEach((user) => {
-      // if (user._id == message.senderid) return;
-      socket.in(user).emit("message recieved", message);
-    });
-    // socket.in(user._id).emit("message recieved", message);
+    // if(!chat?.members) return console.log("chat.members not defined");
+    // chat?.members.forEach((user) => {
+    //   // if (user._id == message.senderid) return;
+    //   socket.in(user).emit("message recieved", message);
+    // });
+    socket.in(user._id).emit("message recieved", message);
   
   //  socket.in(chat._id).emit("message recieved", message);
   });
