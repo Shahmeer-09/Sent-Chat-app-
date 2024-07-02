@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const CustomFetch = axios.create({
-    baseURL: `${window.location.href}/s1`
+    baseURL: `https://sent-xi.vercel.app/s1`
 }) 
 
 export default CustomFetch

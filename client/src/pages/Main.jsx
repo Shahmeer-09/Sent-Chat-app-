@@ -13,7 +13,6 @@ import UserAtom from "../Atoms/UserAtom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Spinner } from "@nextui-org/react";
 import SpinnerV from "../components/SpinnerV";
-import Selected from "../Atoms/SelectedChat";
 export const loader = async () => {
   try {
     const user = await CustomFetch.get("/auth/current");
@@ -34,8 +33,6 @@ const Main = () => {
      localStorage.setItem("user", JSON.stringify(data?.data?.name));
      setUser(data?.data)   
   } , [setUser]);
-
-
   return (
     <Suspense fallback={<SpinnerV />}>
       <div className="h-[100vh] w-[100vw] overflow-hidden   grid grid-cols-1 sm:grid-cols-3">
