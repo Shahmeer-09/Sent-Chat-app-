@@ -56,9 +56,12 @@ const ChatSecction = () => {
     channel= pusher.subscribe(`chat-${selected._id}`);
    
     channel.bind('recieved', function(newmessage){
+      console.log(newmessage)
       if(!newmessage|| newmessage?.message=={}) return
       const gotMessage = newmessage?.message
+      console.log(gotMessage)
       if(gotMessage?.sender?._id != current?._id && gotMessage != {}){
+        console.log(gotMessage)
         setmessages((prev) => [...prev, gotMessage]);
       }
     });
@@ -68,7 +71,7 @@ const ChatSecction = () => {
       pusher.unsubscribe(selected._id);
     };
   },[selected]);
-
+console.log(messsages)
   const fetchmessages = async () => {
     try {
       const res = await CustomFetch.get(
