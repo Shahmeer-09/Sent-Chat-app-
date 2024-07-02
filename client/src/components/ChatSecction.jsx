@@ -1,0 +1,247 @@
+import React, { useEffect, useRef, useState } from "react";
+import Selected from "../Atoms/SelectedChat";
+import UserAtom from "../Atoms/UserAtom";
+import { useRecoilState, useRecoilValue } from "recoil";
+import animationdata from "../assets/chatanim.json";
+import Lottie from "react-lottie";
+import { Avatar } from "@nextui-org/react";
+import { IoIosSend, IoMdSettings } from "react-icons/io";
+import { IoImageSharp } from "react-icons/io5";
+import { getSender, isSameSender } from "../utils/ChatUtils";
+import GroupSettingmodal from "./GroupSettingmodal";
+import { FaArrowLeftLong, FaLeaf } from "react-icons/fa6";
+import Chatmenu from "./ChatSetting";
+import CustomFetch from "../utils/CustomFetch";
+import io from "socket.io-client";
+import { toast } from "react-toastify";
+import { MdOutlineEmojiEmotions } from "react-icons/md";
+import EmojiPicker from "./EmojiPicker";
+import fetchSwitch from "../Atoms/FetchState";
+const ENDPOINT = "http://localhost:8000";
+var socket,comparechats;
+const ChatSecction = () => {
+  const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
+  const current = useRecoilValue(UserAtom);
+  // const [emojiobj, setemojionbj] = useState("");
+  const [selected, setselected] = useRecoilState(Selected);
+  const [message, setmessage] = useState("");
+  const [loading, setloading] = useState(false);
+  const [messsages, setmessages] = useState([]);
+  const [emoji, setemoji] = useState(false);
+  const chatSectionRef = useRef(null);
+  const [notif, setnotif] = useState([]); 
+  // console.log(emojiobj);
+  useEffect(() => {
+    if (chatSectionRef.current) {
+      chatSectionRef.current.scrollTo({
+        top: chatSectionRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messsages]);
+
+  let sender = selected ? getSender(selected?.members, current) : null;
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationdata,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+  useEffect(() => {
+    socket = io(ENDPOINT, {
+      transports: ["websocket", "polling"],
+    });
+    socket.emit("setup", current);
+  }, []);
+  const fetchmessages = async () => {
+    try {
+      const res = await CustomFetch.get(
+        `/message/getMessages?chatid=${selected._id}`
+      );
+      setmessages(res.data?.data);
+      if (res.data?.data.length === 0) {
+        toast.info(
+          "No chats found either cleared or didnt have any to begin with"
+        );
+        setmessages("")
+      }
+      
+      socket.emit("join chat", selected._id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+ 
+  useEffect(() => {
+    socket.on("message recieved", (newmessage) => {
+       if(!comparechats || comparechats._id !== newmessage.chatid){
+          if(!notif.includes(newmessage)){
+          setnotif((prev)=>[...prev,newmessage])
+          }
+       } else{
+            console.log(newmessage)
+        setmessages((prev) => [...prev, newmessage]);
+       }
+     
+    });
+  },[setmessage, setnotif]);
+  // console.log(notif)
+  // console.log(messsages)
+  const handleSendmessage = async () => {
+    setloading(false);
+    try {
+      const res = await CustomFetch.post(
+        `/message/sendMessage?chatid=${selected._id}`,
+        { message }
+      );
+      setmessages((messsages) => [...messsages, res.data?.data[0]]);
+      socket.emit("new message", res.data?.data[0]);
+      setmessage("");
+      setfetchstate(!fetchState);
+    } catch (error) {
+      setloading(false);
+    }
+  };
+  // console.log(messsages);
+
+  useEffect(() => {
+    fetchmessages();
+     comparechats = selected
+  }, [selected]);
+  const handleDeletetConv = async () => {
+    try {
+      if (messsages.length > 0) {
+        await CustomFetch.post(`/message/delMessages?chatid=${selected._id}`);
+        toast.success("Conversation deleted successfully");
+      } else {
+        toast.info("no chat  to delete");
+      }
+      setmessages("");
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowUp") {
+        chatSectionRef.current.scrollBy({
+          top: -50, 
+          behavior: "smooth",
+        });
+      } else if (e.key === "ArrowDown") {
+        chatSectionRef.current.scrollBy({
+          top: 50, 
+          behavior: "smooth",
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+  return (
+    <>
+      {!selected ? (
+        <div className="w-full h-full flex  flex-col relative  items-center justify-center pointer-events-none ">
+          <h5 className="  text-yellow-500 absolute letter-spacing  top-[27%] z-10 font-sans font-bold text-xs ">
+            {" "}
+            Select a chat to start messaging{" "}
+          </h5>
+          <Lottie
+            loop={true}
+            options={defaultOptions}
+            height={300}
+            width={300}
+          />
+        </div>
+      ) : (
+        <>
+          <header className="h-12 flex justify-between items-center    mb-3  px-4 p-2 text-center  bg-zinc-200  rounded-lg ">
+            <div className=" ">
+              <div className="flex items-center gap-2 ">
+                <Avatar
+                  size="md"
+                  src={
+                    selected.isGroupChat
+                      ? selected?.Chaticon
+                      : sender?.profilepic
+                  }
+                  color="gradient"
+                />
+                <p className=" font-bold font-mono ">
+                  {selected.isGroupChat ? selected.ChatName : sender?.name}
+                </p>
+              </div>
+            </div>
+            <div className=" flex items-center gap-4  ">
+              <FaArrowLeftLong
+                className=" cursor-pointer "
+                onClick={() => {
+                  setselected("");
+                  setmessages("");
+                }}
+              />
+
+              <>
+                {selected.isGroupChat ? (
+                  <GroupSettingmodal />
+                ) : (
+                  <Chatmenu deletechat={handleDeletetConv} />
+                )}
+              </>
+            </div>
+          </header>
+
+          <section className=" chatbg h-[78%] w-full  z-0 flex justify-center items-center rounded-lg p-4 ">
+            <div
+              ref={chatSectionRef}
+              className="sm:w-[90%]  w-[100%]    overflow-y-scroll  scrollbar-hide h-full sm:h-[90%] bg-transparent   flex-col  flex gap-2   "
+            >
+              {messsages.length > 0 &&
+                messsages.map((msg) => (
+                  <span
+                    key={msg._id}
+                    className={`p-2 px-3  text-sm  ${
+                      isSameSender(msg, current)
+                        ? " self-end bg-zinc-800 text-zinc-100 "
+                        : "bg-zinc-300 text-zinc-800  self-start"
+                    }  z-10  text-xs  rounded-lg    `}
+                  >
+                    <p  className=" inline text-yellow-500 font-semibold text-xs  ">{isSameSender(msg, current) ? "" : `${msg.sender?.name}`}</p>
+                    
+                    <p className="inline"> {msg.content}</p> 
+                  </span>
+                ))}
+            </div>
+          </section>
+          <div className="px-2 p-1  relative w-[90%] bg-zinc-900 h-12 flex justify-around items-center mx-auto rounded-3xl    mt-3  ">
+            {emoji && <EmojiPicker setmessage={setmessage} message={message} />}
+            <MdOutlineEmojiEmotions
+              onClick={() => setemoji(!emoji)}
+              className=" text-white cursor-pointer size-6 mx-6"
+            />
+            <input
+              value={message}
+              onChange={(e) => setmessage(e.target.value)}
+              type="text"
+              className=" bg-transparent  h-full w-[90%] p-1 px-3 outline-none text-sm text-white    rounded-3xl block  placeholder:text-sm mx-auto "
+              placeholder="Type message here... "
+            />
+            <IoIosSend
+              onClick={handleSendmessage}
+              className=" text-white size-6 mx-6 cursor-pointer "
+            />
+          </div>
+        </>
+      )}
+    </>
+  );
+};
+
+export default ChatSecction;
