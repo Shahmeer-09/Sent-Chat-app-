@@ -20,14 +20,14 @@ if (process.env.NODE_ENV === "development") {
 }
 const corsOptions = {
   origin: "https://sent-chat-app.vercel.app/",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allowed HTTP methods
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
-app.use(express.json({ limit: "50mb" }));
 app.use(cors(corsOptions));
+app.use(express.static(path.resolve(__dirname, "./client/dist")));
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.resolve(__dirname, "./client/dist")));
 app.get('/favicon.ico', (req, res) => {
   res.status(204).end(); 
 });
