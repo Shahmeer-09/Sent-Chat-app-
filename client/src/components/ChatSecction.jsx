@@ -56,11 +56,11 @@ const ChatSecction = () => {
     channel= pusher.subscribe(`chat-${selected._id}`);
    
     channel.bind('recieved', function(newmessage){
-      // if(!newmessage?.message|| newmessage?.message=={}) return
+      if(!newmessage|| newmessage?.message=={}) return
       const gotMessage = newmessage?.message
-      // if(gotMessage?.sender?._id != current?._id ){
+      if(gotMessage?.sender?._id != current?._id && gotMessage != {}){
         setmessages((prev) => [...prev, gotMessage]);
-      // }
+      }
     });
     return () => {
       channel.unbind_all();
@@ -217,6 +217,7 @@ const ChatSecction = () => {
             >
               {messsages.length > 0 &&
                 messsages.map((msg) => (
+                  msg!={} &&
                   <span
                     key={msg._id}
                     className={`p-2 px-3  text-sm  ${
