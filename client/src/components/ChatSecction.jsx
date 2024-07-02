@@ -56,10 +56,10 @@ const ChatSecction = () => {
     channel= pusher.subscribe(`chat-${selected._id}`);
    
     channel.bind('recieved', function(newmessage){
-      const gotMessage = newmessage.message
+      const gotMessage = newmessage?.message
       if(gotMessage?.sender._id != current._id ){
         console.log(gotMessage)
-        setmessages((prev) => [...prev, newmessage]);
+        setmessages((prev) => [...prev, gotMessage]);
       }
     });
     return () => {

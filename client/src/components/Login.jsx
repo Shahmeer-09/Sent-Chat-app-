@@ -27,11 +27,10 @@ const Login = () => {
        setloading(true)
        try {
            const response  =  await CustomFetch.post('/auth/login',inputvalue)
-           console.log(response)
+           navigate('/')
            toast.success(response.data?.message)
            sessionStorage.setItem("user", JSON.stringify(response?.data.data))
            setloading(false)
-           navigate('/')
        } catch (error) {
            toast.error(error?.response?.data?.message || error.message)
           setloading(false)
