@@ -23,7 +23,7 @@ const corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
-console.log(path.resolve(__dirname, "./client/dist", "index.html"))
+console.log(path.resolve(__dirname, "./client/dist/index.html"))
 app.use(cors(corsOptions));
 app.use(express.static(path.resolve(__dirname, ".")));
 app.use(express.json({ limit: "50mb" }));
