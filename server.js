@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://sent-chat-app.vercel.app/",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allowed HTTP methods
   credentials: true,
 };
@@ -46,7 +46,7 @@ const server = http.createServer(app);
 const io = require("socket.io")(server, {  
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:5173/",
+    origin: "https://sent-chat-app.vercel.app/",
 }}); 
 
 

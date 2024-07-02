@@ -7,7 +7,7 @@ export default defineConfig({
   server:{
     proxy:{
       "/s1":{
-        target:"http://localhost:8000",
+        target:"https://sent-chat-app.vercel.app/",
         secure:true
       }
     }
