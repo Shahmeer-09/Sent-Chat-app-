@@ -25,7 +25,7 @@ const corsOptions = {
 };
 console.log(path.resolve(__dirname, "./client/dist/index.html"))
 app.use(cors(corsOptions));
-app.use(express.static(path.resolve(__dirname, ".")));
+app.use(express.static(path.join(__dirname, "./client/dist")));
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: true }));
