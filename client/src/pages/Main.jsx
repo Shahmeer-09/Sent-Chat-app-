@@ -24,15 +24,17 @@ export const loader = async () => {
     return redirect("/authpage");
   }
 };
+
+
 const Main = () => {
-  // const navigate = useNavigate();
+
   const[user, setUser] = useRecoilState(UserAtom);
   const {data}= useLoaderData();
-
   useEffect(() => {
      localStorage.setItem("user", JSON.stringify(data));
      setUser(data?.data)   
-  } , []);
+  } , [setUser]);
+
   
   return (
     <Suspense fallback={<SpinnerV />}>
