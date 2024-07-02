@@ -31,11 +31,11 @@ const Main = () => {
   const[user, setUser] = useRecoilState(UserAtom);
   const {data}= useLoaderData();
   useEffect(() => {
-     localStorage.setItem("user", JSON.stringify(data));
+     localStorage.setItem("user", JSON.stringify(data?.data?.name));
      setUser(data?.data)   
   } , [setUser]);
 
-  
+
   return (
     <Suspense fallback={<SpinnerV />}>
       <div className="h-[100vh] w-[100vw] overflow-hidden   grid grid-cols-1 sm:grid-cols-3">
