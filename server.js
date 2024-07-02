@@ -39,7 +39,7 @@ app.use("/s1/auth", authRouter);
 app.use("/s1/chat", chatrouter);
 app.use("/s1/message", messageRouter);
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./client/dist", "index.html"));
+  res.sendFile(path.join(__dirname, "./client/dist", "index.html"));
 });
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Page not found" });
