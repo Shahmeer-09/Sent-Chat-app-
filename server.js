@@ -19,12 +19,13 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const corsOptions = {
-  origin: "https://sent-chat-idkbqd1jp-shahmeers-projects-90ee6c2b.vercel.app/",
+  origin: ["https://sent-chat-app.vercel.app/", "http://localhost:5173"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
+console.log(path.resolve(__dirname, "./client/dist", "index.html"))
 app.use(cors(corsOptions));
-app.use(express.static(path.resolve(__dirname, "./client/dist")));
+app.use(express.static(path.resolve(__dirname, ".")));
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: true }));
