@@ -10,6 +10,7 @@ const authRouter = require("./routes/authRoutes");
 const chatrouter = require("./routes/ChatRout");
 const messageRouter = require("./routes/Message");
 const EventEmitter = require("events");
+const path = require("path");
 const http = require("http");
 const emitter = new EventEmitter();
 emitter.setMaxListeners(20);
@@ -26,10 +27,11 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cors(corsOptions));
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static(path.resolve(__dirname, "./client/dist")));
 app.use("/s1/auth", authRouter);
 app.use("/s1/chat", chatrouter);
 app.use("/s1/message", messageRouter);
+
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Page not found" });
 });
