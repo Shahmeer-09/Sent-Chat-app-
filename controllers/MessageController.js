@@ -5,13 +5,7 @@ const Apiresponse = require("../utils/Apiresponse");
 const { StatusCodes } = require("http-status-codes");
 const { default: mongoose } = require("mongoose");
 const Pusher = require("pusher")
-const pusher = new Pusher({
-  appId: process.env.PUSHERID,
-  key: process.env.PUSHERKEY,
-  secret:process.env.PUSHERSECRET,
-  cluster: process.env.PUSHERCLUSTER,
-  useTLS: true
-});
+
 
 const sendMessage = async (req, res) => {
   const sender = req.user._id;
@@ -31,10 +25,20 @@ const sendMessage = async (req, res) => {
   const messagefull = await Msg.find({ _id: newmessage._id })
     .populate("sender", "-password")
     .populate("chatid");
-   pusher.trigger(chatid, "recieved", {
-    newmessage: messagefull,
+  console.log(messagefull[0]);
+  if(messagefull.length!=0){
+    const pusher = new Pusher({
+      appId: "1827862",
+      key: "0a9bdc2c0dca9fa15311",
+      secret: "d3e271b829680ba83046",
+      cluster: "ap2",
+      useTLS: true
+    });
+    
+   pusher.trigger(`chat-${chatid}`, "recieved", {
+    message: messagefull[0],
   });
-
+  }
   await Chat.findOneAndUpdate(
     { _id: chatid },
     { $set: { latestMessage: messagefull[0]._id } },

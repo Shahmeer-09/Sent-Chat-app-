@@ -6,8 +6,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import animationdata from "../assets/chatanim.json";
 import Lottie from "react-lottie";
 import { Avatar } from "@nextui-org/react";
-import { IoIosSend, IoMdSettings } from "react-icons/io";
-import { IoImageSharp } from "react-icons/io5";
+import { IoIosSend} from "react-icons/io";
 import { getSender, isSameSender } from "../utils/ChatUtils";
 import GroupSettingmodal from "./GroupSettingmodal";
 import { FaArrowLeftLong, FaLeaf } from "react-icons/fa6";
@@ -18,9 +17,10 @@ import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker from "./EmojiPicker";
 import fetchSwitch from "../Atoms/FetchState";
 import Pusher from "pusher-js";
-// var socket,comparechats;
+var channel;
 const ChatSecction = () => {
   const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
+
   const current = useRecoilValue(UserAtom);
   const [selected, setselected] = useRecoilState(Selected);
   const [message, setmessage] = useState("");
@@ -28,7 +28,14 @@ const ChatSecction = () => {
   const [messsages, setmessages] = useState([]);
   const [emoji, setemoji] = useState(false);
   const chatSectionRef = useRef(null);
-  // const [notif, setnotif] = useState([]);
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationdata,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   useEffect(() => {
     if (chatSectionRef.current) {
       chatSectionRef.current.scrollTo({
@@ -39,33 +46,29 @@ const ChatSecction = () => {
   }, [messsages]);
 
   let sender = selected ? getSender(selected?.members, current) : null;
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationdata,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
 
   useEffect(() => {
-    fetchmessages();
+   fetchmessages()
     const pusher = new Pusher('0a9bdc2c0dca9fa15311', {
       cluster: 'ap2',
       encrypted: true,
     });
-    const channel = pusher.subscribe(selected._id);
-    channel.bind('recieved', (newmessage) =>{
-      if(newmessage.sender._id != current._id ){
+    channel= pusher.subscribe(`chat-${selected._id}`);
+   
+    channel.bind('recieved', function(newmessage){
+      const gotMessage = newmessage.message
+      if(gotMessage?.sender._id != current._id ){
+        console.log(gotMessage)
         setmessages((prev) => [...prev, newmessage]);
       }
     });
-
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
+      pusher.unsubscribe(selected._id);
     };
   },[selected]);
+
   const fetchmessages = async () => {
     try {
       const res = await CustomFetch.get(
@@ -78,8 +81,6 @@ const ChatSecction = () => {
         );
         setmessages("");
       }
-
-      socket.emit("join chat", selected._id);
     } catch (error) {
       console.log(error);
     }
@@ -105,14 +106,14 @@ const ChatSecction = () => {
     try {
       const res = await CustomFetch.post(
         `/message/sendMessage?chatid=${selected._id}`,
-        { message }
+        { message:message }
       );
       setmessages((messsages) => [...messsages, res.data?.data[0]]);
-      // socket.emit("new message", res.data?.data[0]);
       setmessage("");
       setfetchstate(!fetchState);
     } catch (error) {
       setloading(false);
+      console.log(error.response?.data?.message||error.message)
     }
   };
   
@@ -179,9 +180,15 @@ const ChatSecction = () => {
                   }
                   color="gradient"
                 />
-                <p className=" font-bold font-mono ">
+                <div>
+
+                <p className=" font-bold font-mono  flex flex-col ">
                   {selected.isGroupChat ? selected.ChatName : sender?.name}
                 </p>
+                { selected.isGroupChat &&
+                  <span className=" inline text-xs font-semibold text-yellow-600 " > Admin: <p className=" text-xs text-zinc-600  inline" >{selected?.groupAdmin?.name}</p></span>  
+                }
+                </div>
               </div>
             </div>
             <div className=" flex items-center gap-4  ">

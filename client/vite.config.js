@@ -7,11 +7,11 @@ export default defineConfig({
   server:{
     // proxy:{
     //   "/s1":{
-    //     target:"https://sent-chat-app.vercel.app",
+    //     target:"http://localhost:8000",
     //     secure:false,
     //   }
     // }
-  },
+  }, 
   // resolve: {
   //   alias: {
   //     "@": path.resolve(__dirname, "./src"),
