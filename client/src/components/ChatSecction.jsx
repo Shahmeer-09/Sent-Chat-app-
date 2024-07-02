@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker from "./EmojiPicker";
 import fetchSwitch from "../Atoms/FetchState";
-const ENDPOINT = "http://localhost:8000";
+const ENDPOINT = "https://sent-xi.vercel.app/";
 var socket,comparechats;
 const ChatSecction = () => {
   const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
