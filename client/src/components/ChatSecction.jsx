@@ -6,7 +6,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import animationdata from "../assets/chatanim.json";
 import Lottie from "react-lottie";
 import { Avatar } from "@nextui-org/react";
-import { IoIosSend} from "react-icons/io";
+import { IoIosSend } from "react-icons/io";
 import { getSender, isSameSender } from "../utils/ChatUtils";
 import GroupSettingmodal from "./GroupSettingmodal";
 import { FaArrowLeftLong, FaLeaf } from "react-icons/fa6";
@@ -48,20 +48,20 @@ const ChatSecction = () => {
   let sender = selected ? getSender(selected?.members, current) : null;
 
   useEffect(() => {
-   fetchmessages()
-    const pusher = new Pusher('0a9bdc2c0dca9fa15311', {
-      cluster: 'ap2',
+    fetchmessages();
+    const pusher = new Pusher("0a9bdc2c0dca9fa15311", {
+      cluster: "ap2",
       encrypted: true,
     });
-    channel= pusher.subscribe(`chat-${selected._id}`);
-   
-    channel.bind('recieved', function(newmessage){
-      console.log(newmessage)
-      if(!newmessage|| newmessage?.message=={}) return
-      const gotMessage = newmessage?.message
-      console.log(gotMessage)
-      if(gotMessage?.sender?._id != current?._id && gotMessage != {}){
-        console.log(gotMessage)
+    channel = pusher.subscribe(`chat-${selected._id}`);
+
+    channel.bind("recieved", function (newmessage) {
+      console.log(newmessage);
+      if (!newmessage || newmessage?.message == {}) return;
+      const gotMessage = newmessage?.message;
+      console.log(gotMessage);
+      if (gotMessage?.sender?._id != current?._id && gotMessage != {}) {
+        console.log(gotMessage);
         setmessages((prev) => [...prev, gotMessage]);
       }
     });
@@ -70,8 +70,8 @@ const ChatSecction = () => {
       channel.unsubscribe();
       pusher.unsubscribe(selected._id);
     };
-  },[selected]);
-console.log(messsages)
+  }, [selected]);
+  console.log(messsages);
   const fetchmessages = async () => {
     try {
       const res = await CustomFetch.get(
@@ -109,17 +109,17 @@ console.log(messsages)
     try {
       const res = await CustomFetch.post(
         `/message/sendMessage?chatid=${selected._id}`,
-        { message:message }
+        { message: message }
       );
       setmessages((messsages) => [...messsages, res.data?.data[0]]);
       setmessage("");
       setfetchstate(!fetchState);
     } catch (error) {
       setloading(false);
-      console.log(error.response?.data?.message||error.message)
+      console.log(error.response?.data?.message || error.message);
     }
   };
-  
+
   const handleDeletetConv = async () => {
     try {
       if (messsages.length > 0) {
@@ -184,13 +184,18 @@ console.log(messsages)
                   color="gradient"
                 />
                 <div>
-
-                <p className=" font-bold font-mono  flex flex-col ">
-                  {selected.isGroupChat ? selected.ChatName : sender?.name}
-                </p>
-                { selected.isGroupChat &&
-                  <span className=" inline text-xs font-semibold text-yellow-600 " > Admin: <p className=" text-xs text-zinc-600  inline" >{selected?.groupAdmin?.name}</p></span>  
-                }
+                  <p className=" font-bold font-mono  flex flex-col ">
+                    {selected.isGroupChat ? selected.ChatName : sender?.name}
+                  </p>
+                  {selected.isGroupChat && (
+                    <span className=" inline text-xs font-semibold text-yellow-600 ">
+                      {" "}
+                      Admin:{" "}
+                      <p className=" text-xs text-zinc-600  inline">
+                        {selected?.groupAdmin?.name}
+                      </p>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -219,23 +224,27 @@ console.log(messsages)
               className="sm:w-[90%]  w-[100%]    overflow-y-scroll  scrollbar-hide h-full sm:h-[90%] bg-transparent   flex-col  flex gap-2   "
             >
               {messsages.length > 0 &&
-                messsages.map((msg) => (
-                  msg!={} &&
-                  <span
-                    key={msg._id}
-                    className={`p-2 px-3  text-sm  ${
-                      isSameSender(msg, current)
-                        ? " self-end bg-zinc-800 text-zinc-100 "
-                        : "bg-zinc-300 text-zinc-800  self-start"
-                    }  z-10  text-xs  rounded-lg    `}
-                  >
-                    <p className=" inline text-yellow-500 font-semibold text-xs  ">
-                      {isSameSender(msg, current) ? "" : `${msg?.sender?.name}`}
-                    </p>
+                messsages.map(
+                  (msg) =>
+                    msg != {} && (
+                      <span
+                        key={msg._id}
+                        className={`p-2 px-3  text-sm  ${
+                          msg?.sender?._id && msg?.sender?._id == current?._id
+                            ? " self-end bg-zinc-800 text-zinc-100 "
+                            : "bg-zinc-300 text-zinc-800  self-start"
+                        }  z-10  text-xs  rounded-lg    `}
+                      >
+                        <p className=" inline text-yellow-500 font-semibold text-xs  ">
+                          {msg?.sender?._id && msg?.sender?._id == current?._id
+                            ? ""
+                            : `${msg?.sender?.name}`}
+                        </p>
 
-                    <p className="inline"> {msg.content}</p>
-                  </span>
-                ))}
+                        <p className="inline"> {msg.content}</p>
+                      </span>
+                    )
+                )}
             </div>
           </section>
           <div className="px-2 p-1  relative w-[90%] bg-zinc-900 h-12 flex justify-around items-center mx-auto rounded-3xl    mt-3  ">

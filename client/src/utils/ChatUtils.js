@@ -4,9 +4,9 @@ const getSender = (users, current)=>{
    return sender
 }
 
-const isSameSender = async(msg, current)=>{
+const isSameSender = (msg, current)=>{
    try {
-       return await msg?.sender?._id == current?._id
+       return  msg?.sender?._id == current?._id
    } catch (error) {
       console.log(error)
    }
