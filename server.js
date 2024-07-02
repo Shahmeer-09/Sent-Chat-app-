@@ -5,14 +5,16 @@ const cors = require("cors");
 const cookieparser = require("cookie-parser");
 const conectDb = require("./config/ConnectDb");
 const morgan = require("morgan");
+const Pusher = require("pusher");
 const { errormangerhandler } = require("./middlewares/Errormanger");
 const authRouter = require("./routes/authRoutes");
 const chatrouter = require("./routes/ChatRout");
 const messageRouter = require("./routes/Message");
+
 const EventEmitter = require("events");
 const path = require("path");
-const http = require("http");
 const emitter = new EventEmitter();
+
 emitter.setMaxListeners(20);
 const app = express();
 if (process.env.NODE_ENV === "development") {
@@ -46,58 +48,10 @@ app.use("*", (req, res) => {
 });
 app.use(errormangerhandler);
 
-
-
-
-
-
-const server = http.createServer(app);
-const io = require("socket.io")(server, {  
-  pingTimeout: 60000,
-  cors: {
-    origin: ['https://sent-xi.vercel.app', 'http://localhost:5173'],
-  }
-});
-
-io.on("connection", (socket) => {
-  socket.on("setup", (user) => {
-    console.log("User setup:", user);
-    socket.join(user?._id);
-    socket.emit("connected");
-    socket.user = user;  // Store the user information
-  });
-
-  socket.on("join chat", (chatid) => {  
-    socket.join(chatid);
-    console.log(`User joined room: ${chatid}`);
-  });
-
-  socket.on("new message", (message) => {
-    const chat = message?.chatid;
-    console.log("New message received:", message);
-
-    if (!chat?.members) {
-      return console.log("chat.members not defined");
-    }
-
-    chat.members.forEach((user) => {
-      // Ensure user is an ID
-      socket.to(user).emit("message received", message);
-    });
-  });
-
-  socket.on("disconnect", () => {
-    const user = socket.user;
-    if (user) {
-      socket.leave(user._id);
-      console.log(`User disconnected: ${user._id}`);
-    }
-  });
-});
 (async () => {
   try {
     conectDb();
-    server.listen(process.env.PORT && 8000, () => {
+    app.listen(process.env.PORT && 8000, () => {
       console.log(`Server is running on port ${process.env.PORT && 8000}`);
     });
   } catch (error) {
@@ -108,3 +62,53 @@ io.on("connection", (socket) => {
 
 
 module.exports = app;
+
+
+
+
+
+
+
+// const server = http.createServer(app);
+// const io = require("socket.io")(server, {  
+//   pingTimeout: 60000,
+//   cors: {
+//     origin: ['https://sent-xi.vercel.app', 'http://localhost:5173'],
+//   }
+// });
+
+// io.on("connection", (socket) => {
+//   socket.on("setup", (user) => {
+//     console.log("User setup:", user);
+//     socket.join(user?._id);
+//     socket.emit("connected");
+//     socket.user = user;  // Store the user information
+//   });
+
+//   socket.on("join chat", (chatid) => {  
+//     socket.join(chatid);
+//     console.log(`User joined room: ${chatid}`);
+//   });
+
+//   socket.on("new message", (message) => {
+//     const chat = message?.chatid;
+//     console.log("New message received:", message);
+
+//     if (!chat?.members) {
+//       return console.log("chat.members not defined");
+//     }
+
+//     chat.members.forEach((user) => {
+//       // Ensure user is an ID
+//       socket.to(user).emit("message received", message);
+//     });
+//   });
+
+//   socket.on("disconnect", () => {
+//     const user = socket.user;
+//     if (user) {
+//       socket.leave(user._id);
+//       console.log(`User disconnected: ${user._id}`);
+//     }
+//   });
+// });

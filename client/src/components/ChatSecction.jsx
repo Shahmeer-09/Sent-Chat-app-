@@ -1,3 +1,4 @@
+// const ENDPOINT = "https://sent-xi.vercel.app/";
 import React, { useEffect, useRef, useState } from "react";
 import Selected from "../Atoms/SelectedChat";
 import UserAtom from "../Atoms/UserAtom";
@@ -12,13 +13,12 @@ import GroupSettingmodal from "./GroupSettingmodal";
 import { FaArrowLeftLong, FaLeaf } from "react-icons/fa6";
 import Chatmenu from "./ChatSetting";
 import CustomFetch from "../utils/CustomFetch";
-import io from "socket.io-client";
 import { toast } from "react-toastify";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker from "./EmojiPicker";
 import fetchSwitch from "../Atoms/FetchState";
-const ENDPOINT = "https://sent-xi.vercel.app/";
-var socket,comparechats;
+import Pusher from "pusher-js";
+// var socket,comparechats;
 const ChatSecction = () => {
   const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
   const current = useRecoilValue(UserAtom);
@@ -28,7 +28,7 @@ const ChatSecction = () => {
   const [messsages, setmessages] = useState([]);
   const [emoji, setemoji] = useState(false);
   const chatSectionRef = useRef(null);
-  const [notif, setnotif] = useState([]); 
+  // const [notif, setnotif] = useState([]);
   useEffect(() => {
     if (chatSectionRef.current) {
       chatSectionRef.current.scrollTo({
@@ -47,12 +47,25 @@ const ChatSecction = () => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
+
   useEffect(() => {
-    socket = io(ENDPOINT, {
-      transports: ["websocket", "polling"],
+    fetchmessages();
+    const pusher = new Pusher('0a9bdc2c0dca9fa15311', {
+      cluster: 'ap2',
+      encrypted: true,
     });
-    socket.emit("setup", current);
-  }, []);
+    const channel = pusher.subscribe(selected._id);
+    channel.bind('recieved', (newmessage) =>{
+      if(newmessage.sender._id != current._id ){
+        setmessages((prev) => [...prev, newmessage]);
+      }
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  },[selected]);
   const fetchmessages = async () => {
     try {
       const res = await CustomFetch.get(
@@ -63,30 +76,30 @@ const ChatSecction = () => {
         toast.info(
           "No chats found either cleared or didnt have any to begin with"
         );
-        setmessages("")
+        setmessages("");
       }
-      
+
       socket.emit("join chat", selected._id);
     } catch (error) {
       console.log(error);
     }
   };
- 
-  useEffect(() => {
-    socket.on("message recieved", (newmessage) => {
-      //  if(!comparechats || comparechats._id !== newmessage.chatid){
-      //     if(!notif.includes(newmessage)){
-      //     setnotif((prev)=>[...prev,newmessage])
-      //     }
-      //  } else{
-            console.log("you got a message")
-        setmessages((prev) => [...prev, newmessage]);
-      //  }
-     
-    });
-  },[setmessage, setnotif]);
-  // console.log(notif)
-  // console.log(messsages)
+
+  // useEffect(() => {
+  //   socket.on("message recieved", (newmessage) => {
+  //     //  if(!comparechats || comparechats._id !== newmessage.chatid){
+  //     //     if(!notif.includes(newmessage)){
+  //     //     setnotif((prev)=>[...prev,newmessage])
+  //     //     }
+  //     //  } else{
+  //           console.log("you got a message")
+  //       setmessages((prev) => [...prev, newmessage]);
+  //     //  }
+
+  //   });
+  // },[setmessage, setnotif]);
+  // // console.log(notif)
+  // // console.log(messsages)
   const handleSendmessage = async () => {
     setloading(false);
     try {
@@ -95,19 +108,14 @@ const ChatSecction = () => {
         { message }
       );
       setmessages((messsages) => [...messsages, res.data?.data[0]]);
-      socket.emit("new message", res.data?.data[0]);
+      // socket.emit("new message", res.data?.data[0]);
       setmessage("");
       setfetchstate(!fetchState);
     } catch (error) {
       setloading(false);
     }
   };
-  // console.log(messsages);
-
-  useEffect(() => {
-    fetchmessages();
-     comparechats = selected
-  }, [selected]);
+  
   const handleDeletetConv = async () => {
     try {
       if (messsages.length > 0) {
@@ -125,12 +133,12 @@ const ChatSecction = () => {
     const handleKeyDown = (e) => {
       if (e.key === "ArrowUp") {
         chatSectionRef.current.scrollBy({
-          top: -50, 
+          top: -50,
           behavior: "smooth",
         });
       } else if (e.key === "ArrowDown") {
         chatSectionRef.current.scrollBy({
-          top: 50, 
+          top: 50,
           behavior: "smooth",
         });
       }
@@ -139,7 +147,6 @@ const ChatSecction = () => {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
@@ -211,9 +218,11 @@ const ChatSecction = () => {
                         : "bg-zinc-300 text-zinc-800  self-start"
                     }  z-10  text-xs  rounded-lg    `}
                   >
-                    <p  className=" inline text-yellow-500 font-semibold text-xs  ">{isSameSender(msg, current) ? "" : `${msg.sender?.name}`}</p>
-                    
-                    <p className="inline"> {msg.content}</p> 
+                    <p className=" inline text-yellow-500 font-semibold text-xs  ">
+                      {isSameSender(msg, current) ? "" : `${msg.sender?.name}`}
+                    </p>
+
+                    <p className="inline"> {msg.content}</p>
                   </span>
                 ))}
             </div>

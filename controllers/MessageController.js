@@ -4,17 +4,25 @@ const Chat = require("../model/Chat.model");
 const Apiresponse = require("../utils/Apiresponse");
 const { StatusCodes } = require("http-status-codes");
 const { default: mongoose } = require("mongoose");
+const Pusher = require("pusher")
+const pusher = new Pusher({
+  appId: process.env.PUSHERID,
+  key: process.env.PUSHERKEY,
+  secret:process.env.PUSHERSECRET,
+  cluster: process.env.PUSHERCLUSTER,
+  useTLS: true
+});
+
 const sendMessage = async (req, res) => {
   const sender = req.user._id;
   const { chatid } = req.query;
+  const { message } = req.body;
   if (!mongoose.isValidObjectId(chatid)) {
    throw new badReqError("Please enter a valid chat id");
  }
-  const { message } = req.body;
   if (!(chatid || message)) {
     throw new badReqError("All fields are required");
   }
-
   const newmessage = await Msg.create({
     content: message,
     sender: sender,
@@ -23,6 +31,9 @@ const sendMessage = async (req, res) => {
   const messagefull = await Msg.find({ _id: newmessage._id })
     .populate("sender", "-password")
     .populate("chatid");
+   pusher.trigger(chatid, "recieved", {
+    newmessage: messagefull,
+  });
 
   await Chat.findOneAndUpdate(
     { _id: chatid },
