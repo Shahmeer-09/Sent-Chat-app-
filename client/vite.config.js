@@ -8,7 +8,7 @@ export default defineConfig({
     proxy:{
       "/s1":{
         target:"https://sent-chat-app.vercel.app/",
-        secure:true
+        secure:false,
       }
     }
   },
