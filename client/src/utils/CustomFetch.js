@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const CustomFetch = axios.create({
-    baseURL: `/s1`
+    baseURL: `https://sent-chat-app.vercel.app/s1`
 }) 
 
 export default CustomFetch
