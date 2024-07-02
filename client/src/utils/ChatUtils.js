@@ -4,12 +4,12 @@ const getSender = (users, current)=>{
    return sender
 }
 
-const isSameSender = (msg, current)=>{
-    if(msg?.sender?._id == current?._id){
-       return true
-    }
-    else{
-       return false
-    }
+const isSameSender = async(msg, current)=>{
+   try {
+       return await msg?.sender?._id == current?._id
+   } catch (error) {
+      console.log(error)
+   }
+    
    }
 export {getSender, isSameSender}

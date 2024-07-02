@@ -227,7 +227,7 @@ const ChatSecction = () => {
                     }  z-10  text-xs  rounded-lg    `}
                   >
                     <p className=" inline text-yellow-500 font-semibold text-xs  ">
-                      {isSameSender(msg, current) ? "" : `${msg.sender?.name}`}
+                      {isSameSender(msg, current) ? "" : `${msg?.sender?.name}`}
                     </p>
 
                     <p className="inline"> {msg.content}</p>
