@@ -22,7 +22,6 @@ var socket,comparechats;
 const ChatSecction = () => {
   const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
   const current = useRecoilValue(UserAtom);
-  // const [emojiobj, setemojionbj] = useState("");
   const [selected, setselected] = useRecoilState(Selected);
   const [message, setmessage] = useState("");
   const [loading, setloading] = useState(false);
@@ -30,7 +29,6 @@ const ChatSecction = () => {
   const [emoji, setemoji] = useState(false);
   const chatSectionRef = useRef(null);
   const [notif, setnotif] = useState([]); 
-  // console.log(emojiobj);
   useEffect(() => {
     if (chatSectionRef.current) {
       chatSectionRef.current.scrollTo({

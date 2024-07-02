@@ -55,7 +55,7 @@ const server = http.createServer(app);
 const io = require("socket.io")(server, {  
   pingTimeout: 60000,
   cors: {
-    origin: "https://sent-xi.vercel.app/",
+    origin: ['https://sent-xi.vercel.app', 'http://localhost:5173'],
   }
 });
 
