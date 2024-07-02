@@ -28,6 +28,7 @@ app.use(cors(corsOptions));
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve(__dirname, "./client/dist")));
+app.get('/favicon.ico', (req, res) => res.status(204));
 app.use("/s1/auth", authRouter);
 app.use("/s1/chat", chatrouter);
 app.use("/s1/message", messageRouter);
