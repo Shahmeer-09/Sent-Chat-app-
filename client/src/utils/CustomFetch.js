@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const CustomFetch = axios.create({
-    baseURL: `https://sent-xi.vercel.app/s1`
+    baseURL: `https://sent-rose.vercel.app/authpage/s1`
 }) 
 
 export default CustomFetch

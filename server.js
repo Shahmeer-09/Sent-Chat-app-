@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const corsOptions = {
-  origin: ["https://sent-xi.vercel.app/", "http://localhost:5173"],
+  origin: ["https://sent-rose.vercel.app/authpage", "http://localhost:5173"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
