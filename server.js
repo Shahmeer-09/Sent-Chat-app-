@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const corsOptions = {
-  origin: "https://sent-chat-app.vercel.app/",
+  origin: "https://sent-chat-idkbqd1jp-shahmeers-projects-90ee6c2b.vercel.app/",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true,
 };
