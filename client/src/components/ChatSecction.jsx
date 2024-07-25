@@ -56,12 +56,9 @@ const ChatSecction = () => {
     channel = pusher.subscribe(`chat-${selected._id}`);
 
     channel.bind("recieved", function (newmessage) {
-      console.log(newmessage);
       if (!newmessage || newmessage?.message == {}) return;
       const gotMessage = newmessage?.message;
-      console.log(gotMessage);
       if (gotMessage?.sender?._id != current?._id && gotMessage != {}) {
-        console.log(gotMessage);
         setmessages((prev) => [...prev, gotMessage]);
       }
     });
@@ -71,7 +68,7 @@ const ChatSecction = () => {
       pusher.unsubscribe(selected._id);
     };
   }, [selected]);
-  console.log(messsages);
+
   const fetchmessages = async () => {
     try {
       const res = await CustomFetch.get(
@@ -159,13 +156,16 @@ const ChatSecction = () => {
   useEffect(() => {
     const handleEnter = (e) => {
       if (e.key === "Enter") {
-        handleSendmessage();
+        e.preventDefault();
+        if (message.trim() !== "") {
+          handleSendmessage();
+        }
       }
     };
 
-    window.addEventListener("click", handleEnter);
+    window.addEventListener("keypress", handleEnter);
     return () => {
-      window.removeEventListener("click", handleEnter);
+      window.removeEventListener("keypress", handleEnter);
     };
   }, [message]);
   return (

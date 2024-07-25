@@ -1,7 +1,10 @@
 import React from "react";
-
 const MainIcon = () => {
-  return <div className="   bg-mainicon w-14 bg-white rounded-[50%]  h-14  bg-center bg-cover"></div>;
+  return(
+    <div className=" bg-gradient-to-r  from-cyan-500 to-yellow-400  rounded-full h-[40px] w-[40px]    " >
+      
+    </div>
+  )
 };
 
 export default MainIcon;

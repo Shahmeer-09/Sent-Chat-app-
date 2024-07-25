@@ -7,7 +7,8 @@ export default defineConfig({
   server:{
     proxy:{
       "/s1":{
-        target:"https://sent-rose.vercel.app",
+        // target:"https://sent-rose.vercel.app",
+        target:"http://localhost:8000",
         secure:false,
       }
     }
