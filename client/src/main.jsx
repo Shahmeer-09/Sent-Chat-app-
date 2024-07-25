@@ -11,6 +11,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
  
       <NextUIProvider>
+        
         <App />
         <ToastContainer position="top-right" autoClose={2000} />
       </NextUIProvider>

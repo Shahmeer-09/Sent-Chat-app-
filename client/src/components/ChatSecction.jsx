@@ -20,7 +20,7 @@ import Pusher from "pusher-js";
 var channel;
 const ChatSecction = () => {
   const [fetchState, setfetchstate] = useRecoilState(fetchSwitch);
-
+  const containerRef = useRef();
   const current = useRecoilValue(UserAtom);
   const [selected, setselected] = useRecoilState(Selected);
   const [message, setmessage] = useState("");
@@ -89,21 +89,6 @@ const ChatSecction = () => {
     }
   };
 
-  // useEffect(() => {
-  //   socket.on("message recieved", (newmessage) => {
-  //     //  if(!comparechats || comparechats._id !== newmessage.chatid){
-  //     //     if(!notif.includes(newmessage)){
-  //     //     setnotif((prev)=>[...prev,newmessage])
-  //     //     }
-  //     //  } else{
-  //           console.log("you got a message")
-  //       setmessages((prev) => [...prev, newmessage]);
-  //     //  }
-
-  //   });
-  // },[setmessage, setnotif]);
-  // // console.log(notif)
-  // // console.log(messsages)
   const handleSendmessage = async () => {
     setloading(false);
     try {
@@ -154,6 +139,35 @@ const ChatSecction = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setemoji(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+  useEffect(() => {
+    const handleEnter = (e) => {
+      if (e.key === "Enter") {
+        handleSendmessage();
+      }
+    };
+
+    window.addEventListener("click", handleEnter);
+    return () => {
+      window.removeEventListener("click", handleEnter);
+    };
+  }, [message]);
   return (
     <>
       {!selected ? (
@@ -247,7 +261,10 @@ const ChatSecction = () => {
                 )}
             </div>
           </section>
-          <div className="px-2 p-1  relative w-[90%] bg-zinc-900 h-12 flex justify-around items-center mx-auto rounded-3xl    mt-3  ">
+          <div
+            ref={containerRef}
+            className="px-2 p-1  relative w-[90%] bg-zinc-900 h-12 flex justify-around items-center mx-auto rounded-3xl    mt-3  "
+          >
             {emoji && <EmojiPicker setmessage={setmessage} message={message} />}
             <MdOutlineEmojiEmotions
               onClick={() => setemoji(!emoji)}
